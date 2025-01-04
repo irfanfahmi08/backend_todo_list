@@ -27,6 +27,11 @@ class User extends Model implements Authenticatable
         return $this->hasMany(Task::class, "user_id", "id");
     }
 
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Task::class, "user_id", "id");
+    }
+
     public function getAuthIdentifierName()
     {
         return 'username';
