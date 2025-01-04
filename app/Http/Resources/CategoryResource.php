@@ -14,6 +14,13 @@ class CategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'status' => 'Success',
+            'message' => 'Create Categories Successfully',
+            'data' => [
+                'id' => $this->id,
+                'name' => $this->name
+            ]
+            ];
     }
 }
