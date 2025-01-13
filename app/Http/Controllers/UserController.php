@@ -33,10 +33,14 @@ class UserController extends Controller
         $user->password = Hash::make($data['password']);
         $user->save();
 
-        return (new UserResource($user))->response()->setStatusCode(201);
+        return response()->json([
+            'status' => 'Success',
+            'message' => 'Register Successfully',
+            'data' => new UserResource($user)
+        ],201);
     }
 
-    public function login(UserLoginRequest $request): JsonResource
+    public function login(UserLoginRequest $request): JsonResponse
     {
         $data = $request->validated();
 
@@ -55,7 +59,10 @@ class UserController extends Controller
         $user_or_email->token = Str::uuid()->toString();
         $user_or_email->save();
 
-        return new UserResource($user_or_email);
+        return response()->json([
+            'status' => 'Success',
+            'data' => new UserResource($user_or_email)
+        ]);;
     }
 
     public function get(Request $request): UserResource
@@ -71,6 +78,7 @@ class UserController extends Controller
         $user->save();
 
         return response()->json([
+            'status' => true,
             'data' => "Success logout"
         ])->setStatusCode(200);
     }
