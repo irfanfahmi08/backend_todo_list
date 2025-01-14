@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -71,7 +72,7 @@ class UserController extends Controller
         return new UserResource($user);
     }
 
-    public function logout(Request $request): JsonResponse
+    public function logout(): JsonResponse
     {
         $user = Auth::user();
         $user->token = null;
@@ -81,5 +82,36 @@ class UserController extends Controller
             'status' => true,
             'data' => "Success logout"
         ])->setStatusCode(200);
+    }
+
+    public function update(UserUpdateRequest $request): JsonResponse
+    {
+        $user = Auth::user();
+        $data = $request->validated();
+
+        if(isset($data['username'])) {
+            $user->username = $data['username'];
+        }
+        if(isset($data['name'])) {
+            $user->name = $data['name'];
+        }  
+        if(isset($data['email'])) {
+            $user->email = $data['email'];
+        }
+
+        if (User::where('username', $data['username'])->orWhere('email', $data['email'])->count() == 1){
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "messages" => [
+                        "username & email already exist"]
+                        ]
+                    ],400 ));
+        }
+        $user->save();
+        return response()->json([
+            'status' => 'Success',
+            'message' => 'Update Successfully',
+            'data' => new UserResource($user)
+        ],201);
     }
 }
