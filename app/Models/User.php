@@ -19,7 +19,8 @@ class User extends Model implements Authenticatable
         'username',
         'password',
         'name',
-        'email'
+        'email',
+        'profile_picture'
     ];
 
     public function tasks(): HasMany
