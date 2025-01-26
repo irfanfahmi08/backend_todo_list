@@ -26,7 +26,10 @@ Route::post('/users/login', [UserController::class, 'login']);
 
 Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::get('/users/current', [UserController::class, 'get']);
-    Route::patch('/users/current', [UserController::class, 'update']);
+    Route::put('/users/current', [UserController::class, 'update']);
+    Route::get('/users/current/profile-picture', [UserController::class, 'getPhotoProfile']);
+    Route::post('/users/current/profile-picture', [UserController::class, 'updatePhoto']);
+    Route::delete('/users/current/profile-picture', [UserController::class, 'deletePhoto']);
     Route::delete('/users/logout', [UserController::class, 'logout']);
 
     Route::post('/categories', [CategoryController::class, 'create']);
