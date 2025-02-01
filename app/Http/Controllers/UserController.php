@@ -6,8 +6,12 @@ use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Requests\UserUpdatePhotoRequest;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\CategoryResource;
+use App\Http\Resources\TaskResource;
 use App\Http\Resources\UserPhotoResource;
 use App\Http\Resources\UserResource;
+use App\Models\Category;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
@@ -190,5 +194,44 @@ class UserController extends Controller
         return response()->json([
             'error' => 'No photo to delete'
         ], 400);
+    }
+
+    public function listTask(): JsonResponse
+    {
+        $user = Auth::user();
+        // return new TaskResource($user);
+        $categories = Category::where('user_id', $user->id)->get();
+        $tasks = Task::where('user_id', $user->id)->get();
+
+        if ($tasks->isEmpty()) {
+            return response()->json([
+                'message' => 'No tasks found for the user.'
+            ], 404);
+        }
+
+        // Menggabungkan kategori dengan task di dalamnya
+        $categoryData = $categories->map(function($category) use ($tasks) {
+            // Ambil semua task berdasarkan category_id
+            $categoryTasks = $tasks->where('category_id', $category->id);
+            
+            // Menambahkan data task ke dalam setiap kategori
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'tasks' => TaskResource::collection($categoryTasks),
+            ];
+        });
+
+        // Kembalikan response JSON dengan kategori dan task
+        return response()->json([
+            'user_id' => $user->id,
+            'categories' => $categoryData
+        ], 200);
+
+        // return response()->json([
+        //     'user_id' => $user->id,
+        //     'categories' => CategoryResource::collection($categories),
+        //     'tasks' => TaskResource::collection($tasks)
+        // ],200);
     }
 }

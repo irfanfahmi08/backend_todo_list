@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\ApiAuthMiddleware;
+use App\Http\Resources\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,7 @@ Route::post('/users/login', [UserController::class, 'login']);
 
 Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::get('/users/current', [UserController::class, 'get']);
+    Route::get('/users/current/task', [UserController::class, 'listTask']);
     Route::put('/users/current', [UserController::class, 'update']);
     Route::get('/users/current/profile-picture', [UserController::class, 'getPhotoProfile']);
     Route::post('/users/current/profile-picture', [UserController::class, 'updatePhoto']);
@@ -37,4 +40,8 @@ Route::middleware(ApiAuthMiddleware::class)->group(function () {
     Route::get('/categories/{id}', [CategoryController::class, 'get'])->where('id', '[0-9]+');
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->where('id', '[0-9]+');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->where('id', '[0-9]+');
+
+    Route::post('/categories/{idCategory}/task', [TaskController::class, 'create'])->where('id', '[0-9]+');
+    Route::get('/categories/{idCategory}/task', [TaskController::class, 'show'])->where('id', '[0-9]+');
+    Route::get('/categories/{idCategory}/task/{idTask}', [TaskController::class, 'get'])->where('id', '[0-9]+');
 });
